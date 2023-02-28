@@ -4,9 +4,11 @@ import (
 	"testing"
 
 	"golang.org/x/exp/slices"
+	"golang.org/x/net/html"
 )
 
-const A = `<div>
+const A = `
+<div>
     <p>最初のp</p>
     <p>next p</p>
 </div>`
@@ -14,20 +16,21 @@ const A = `<div>
 func TestNode_Find(t *testing.T) {
 	case1, err := ParseS(A)
 	if err != nil {
-		t.Errorf("failed to parse: %v", err)
+		t.Fatalf("failed to parse: %v", err)
 	}
 
-	tests := []struct {
-		n    *Node
+	for _, tt := range []struct {
+		name string
+		n    Nodes
 		m    Match
 		want []string
 	}{
-		{case1, func(node *Node) bool { return node.Data == "p" }, []string{"最初のp", "next p"}},
-	}
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			p := tt.n.Find(tt.m)
-			got := []string{p[0].Text(), p[1].Text()}
+		{"normal", case1,
+			func(node *html.Node) bool { return node.Data == "p" },
+			[]string{"最初のp", "next p"}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.Find(tt.m).Texts()
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("Node.Find() = %v, want %v", got, tt.want)
 			}

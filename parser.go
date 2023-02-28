@@ -8,56 +8,68 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Node html.Node
-type Nodes []*Node
+type Nodes []*html.Node
 
-type Match func(*Node) bool
-
-func Parse(r io.Reader) (*Node, error) {
+func Parse(r io.Reader) (Nodes, error) {
 	n, err := html.Parse(r)
-	nn := Node(*n)
-	return &nn, err
+	return Nodes{n}, err
 }
 
-func ParseS(s string) (*Node, error) {
+func ParseS(s string) (Nodes, error) {
 	return Parse(strings.NewReader(s))
 }
 
-func ParseB(b []byte) (*Node, error) {
+func ParseB(b []byte) (Nodes, error) {
 	return Parse(bytes.NewReader(b))
 }
 
-func (node *Node) Find(m Match) Nodes {
-	var inner func(*Node)
+func (nodes Nodes) Find(m Match) Nodes {
+	var inner func(*html.Node)
 	var res Nodes
-	inner = func(n *Node) {
+	inner = func(n *html.Node) {
 		if m(n) {
 			res = append(res, n)
 			return
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			tmp := Node(*c)
-			inner(&tmp)
+			inner(c)
 		}
 	}
 
-	inner(node)
+	for _, n := range nodes {
+		inner(n)
+	}
 	return res
 }
 
-func (n *Node) Text() string {
-	var inner func(n *Node)
+func (nodes Nodes) Text() string {
 	var t string
-	inner = func(n *Node) {
+	var inner func(n *html.Node)
+	inner = func(n *html.Node) {
 		if n.Type == html.TextNode {
 			t += n.Data
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			tmp := Node(*c)
-			inner(&tmp)
+			inner(c)
 		}
 	}
 
-	inner(n)
+	for _, n := range nodes {
+		inner(n)
+	}
 	return t
+}
+
+func (nodes Nodes) Texts() []string {
+	return Map(nodes, func(n *html.Node) string {
+		return Nodes{n}.Text()
+	})
+}
+
+func Map[T any](nodes Nodes, f func(n *html.Node) T) []T {
+	res := []T{}
+	for _, n := range nodes {
+		res = append(res, f(n))
+	}
+	return res
 }
