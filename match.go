@@ -44,6 +44,13 @@ func Cls(cls string) Match {
 	}
 }
 
+func ID(id string) Match {
+	return func(n Node) bool {
+		val, ok := n.attrVal("id")
+		return ok && slices.Contains(strings.Split(val, " "), id)
+	}
+}
+
 func HasAttr(attr string) Match {
 	return func(n Node) bool {
 		_, ok := n.attrVal(attr)
