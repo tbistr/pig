@@ -9,6 +9,28 @@ import (
 
 type Match func(Node) bool
 
+func And(ms ...Match) Match {
+	return func(n Node) bool {
+		for _, m := range ms {
+			if !m(n) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func Or(ms ...Match) Match {
+	return func(n Node) bool {
+		for _, m := range ms {
+			if m(n) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func Tag(tag string) Match {
 	return func(n Node) bool {
 		return n.Type == html.ElementNode && n.Data == tag
@@ -17,26 +39,26 @@ func Tag(tag string) Match {
 
 func Cls(cls string) Match {
 	return func(n Node) bool {
-		val, ok := attrVal(n, "class")
+		val, ok := n.attrVal("class")
 		return ok && slices.Contains(strings.Split(val, " "), cls)
 	}
 }
 
 func HasAttr(attr string) Match {
 	return func(n Node) bool {
-		_, ok := attrVal(n, attr)
+		_, ok := n.attrVal(attr)
 		return ok
 	}
 }
 
 func HasAttrVal(attr, val string) Match {
 	return func(n Node) bool {
-		mayVal, ok := attrVal(n, attr)
+		mayVal, ok := n.attrVal(attr)
 		return ok && mayVal == val
 	}
 }
 
-func attrVal(n Node, attr string) (string, bool) {
+func (n Node) attrVal(attr string) (string, bool) {
 	for _, a := range n.Attr {
 		if a.Key == attr {
 			return a.Val, true
