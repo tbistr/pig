@@ -65,3 +65,12 @@ func (n Node) Text() string {
 	inner(n)
 	return t
 }
+
+func (n Node) AttrVal(attr string) (string, bool) {
+	for _, a := range n.Node.Attr {
+		if a.Key == attr {
+			return a.Val, true
+		}
+	}
+	return "", false
+}

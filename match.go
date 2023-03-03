@@ -39,37 +39,28 @@ func Tag(tag string) Match {
 
 func Cls(cls string) Match {
 	return func(n Node) bool {
-		val, ok := n.attrVal("class")
+		val, ok := n.AttrVal("class")
 		return ok && slices.Contains(strings.Split(val, " "), cls)
 	}
 }
 
 func ID(id string) Match {
 	return func(n Node) bool {
-		val, ok := n.attrVal("id")
+		val, ok := n.AttrVal("id")
 		return ok && slices.Contains(strings.Split(val, " "), id)
 	}
 }
 
 func HasAttr(attr string) Match {
 	return func(n Node) bool {
-		_, ok := n.attrVal(attr)
+		_, ok := n.AttrVal(attr)
 		return ok
 	}
 }
 
 func HasAttrVal(attr, val string) Match {
 	return func(n Node) bool {
-		mayVal, ok := n.attrVal(attr)
+		mayVal, ok := n.AttrVal(attr)
 		return ok && mayVal == val
 	}
-}
-
-func (n Node) attrVal(attr string) (string, bool) {
-	for _, a := range n.Attr {
-		if a.Key == attr {
-			return a.Val, true
-		}
-	}
-	return "", false
 }
