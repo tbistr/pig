@@ -40,6 +40,16 @@ func (n Node) Find(m Match) Node {
 	return found
 }
 
+func (n Node) Index(i int) (Node, bool) {
+	for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
+		if i == 0 {
+			return c, true
+		}
+		i--
+	}
+	return Node{}, false
+}
+
 func (n Node) Text() string {
 	var t string
 	var inner func(n Node)
