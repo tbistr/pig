@@ -1,3 +1,4 @@
-# golang-vscode-devcontainer
+# pig
 
-vscode devcontainer for golang.
+Traverse and find HTML nodes.
+Based on std library's `*html.Node`, add extension methods to it.
