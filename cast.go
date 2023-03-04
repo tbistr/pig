@@ -9,5 +9,10 @@ func MakeNode(ns ...Node) Node {
 }
 
 func (n Node) Children() []Node {
-	return nil
+	found := []Node{}
+	for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
+		found = append(found, c)
+	}
+
+	return found
 }
