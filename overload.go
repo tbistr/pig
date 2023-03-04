@@ -9,7 +9,7 @@ func (n Node) appendChild(c Node) {
 	nc.Node.DataAtom = c.DataAtom
 	nc.Node.Data = c.Data
 	nc.Node.Namespace = c.Namespace
-	copy(nc.Node.Attr, c.Attr)
+	nc.Node.Attr = c.Attr
 
 	n.Node.AppendChild(nc.Node)
 }
