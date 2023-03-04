@@ -10,7 +10,12 @@ import (
 
 type Node struct{ *html.Node }
 
-func EmpNode() Node { return Node{&html.Node{Type: html.DocumentNode}} }
+func EmpNode() Node {
+	return Node{&html.Node{
+		Type: html.DocumentNode,
+		Attr: []html.Attribute{},
+	}}
+}
 
 func Parse(r io.Reader) (Node, error) {
 	n, err := html.Parse(r)
