@@ -26,18 +26,47 @@ func ParseB(b []byte) (Node, error) {
 func (n Node) Find(m Match) Node {
 	var inner func(Node)
 	var found Node
-	inner = func(n Node) {
-		if m(n) {
-			found.appendChild(n)
+	inner = func(in Node) {
+		if m(in) {
+			found.appendChild(in)
 			return
 		}
-		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
+		for c := in.FirstChild(); c.Node != nil; c = c.NextSibling() {
 			inner(c)
 		}
 	}
 
 	inner(n)
 	return found
+}
+
+func (n Node) FindDescendant(ms ...Match) Node {
+	found := n
+	for _, m := range ms {
+		found = found.Find(m)
+	}
+	return found
+}
+
+func (n Node) FindChild(ms ...Match) Node {
+	found := n.Children()
+
+	inner := func(ins []Node, m Match) []Node {
+		iFound := []Node{}
+		for _, in := range ins {
+			for c := in.FirstChild(); c.Node != nil; c = c.NextSibling() {
+				if m(c) {
+					iFound = append(iFound, c)
+				}
+			}
+		}
+		return iFound
+	}
+
+	for _, m := range ms {
+		found = inner(found, m)
+	}
+	return MakeNode(found...)
 }
 
 func (n Node) Index(i int) (Node, bool) {
