@@ -28,7 +28,7 @@ func (n Node) Find(m Match) Node {
 	var found Node
 	inner = func(n Node) {
 		if m(n) {
-			found.AppendChild(n)
+			found.appendChild(n)
 			return
 		}
 		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {

@@ -3,7 +3,7 @@ package pig
 func MakeNode(ns ...Node) Node {
 	p := Node{}
 	for _, n := range ns {
-		p.AppendChild(n)
+		p.appendChild(n)
 	}
 	return p
 }
