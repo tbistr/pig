@@ -1,19 +1,17 @@
 package pig
 
-import "golang.org/x/net/html"
-
 func (n Node) appendChild(c Node) {
-	nc := &html.Node{
-		FirstChild: c.Node.FirstChild,
-		LastChild:  c.Node.LastChild,
+	nc := EmpNode()
+	nc.Node.FirstChild = c.Node.FirstChild
+	nc.Node.LastChild = c.Node.LastChild
 
-		Type:      c.Type,
-		DataAtom:  c.DataAtom,
-		Data:      c.Data,
-		Namespace: c.Namespace,
-		Attr:      c.Attr,
-	}
-	n.Node.AppendChild(nc)
+	nc.Node.Type = c.Type
+	nc.Node.DataAtom = c.DataAtom
+	nc.Node.Data = c.Data
+	nc.Node.Namespace = c.Namespace
+	copy(nc.Node.Attr, c.Attr)
+
+	n.Node.AppendChild(nc.Node)
 }
 
 func (n Node) Parent() Node {

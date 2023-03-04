@@ -10,6 +10,8 @@ import (
 
 type Node struct{ *html.Node }
 
+func EmpNode() Node { return Node{&html.Node{Type: html.DocumentNode}} }
+
 func Parse(r io.Reader) (Node, error) {
 	n, err := html.Parse(r)
 	return Node{n}, err
@@ -25,7 +27,7 @@ func ParseB(b []byte) (Node, error) {
 
 func (n Node) Find(m Match) Node {
 	var inner func(Node)
-	var found Node
+	found := EmpNode()
 	inner = func(in Node) {
 		if m(in) {
 			found.appendChild(in)
