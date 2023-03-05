@@ -102,6 +102,12 @@ func (n Node) Text() string {
 	return t
 }
 
+func (n Node) Html() (string, error) {
+	var b bytes.Buffer
+	err := html.Render(&b, n.Node)
+	return b.String(), err
+}
+
 func (n Node) AttrVal(attr string) (string, bool) {
 	for _, a := range n.Node.Attr {
 		if a.Key == attr {
