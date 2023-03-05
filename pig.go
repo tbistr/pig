@@ -83,7 +83,7 @@ func (n Node) Index(i int) (Node, bool) {
 		}
 		i--
 	}
-	return Node{}, false
+	return EmpNode(), false
 }
 
 func (n Node) Text() string {
