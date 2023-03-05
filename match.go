@@ -9,6 +9,30 @@ import (
 
 type Match func(Node) bool
 
+func (m Match) And(ms ...Match) Match {
+	return func(n Node) bool {
+		if !m(n) {
+			return false
+		}
+		return And(ms...)(n)
+	}
+}
+
+func (m Match) Or(ms ...Match) Match {
+	return func(n Node) bool {
+		if m(n) {
+			return true
+		}
+		return Or(ms...)(n)
+	}
+}
+
+func (m Match) Not() Match {
+	return func(n Node) bool {
+		return !m(n)
+	}
+}
+
 func And(ms ...Match) Match {
 	return func(n Node) bool {
 		for _, m := range ms {
