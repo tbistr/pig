@@ -8,6 +8,16 @@ func Map[T any](node Node, f func(n Node) T) []T {
 	return res
 }
 
-func (node Node) Each(f func(Node) Node) []Node {
-	return Map(node, f)
+func (node Node) Each(f func(int, Node) Node) {
+	for i, c := range node.Children() {
+		f(i, c)
+	}
+}
+
+func (node Node) EachBreak(f func(int, Node) bool) {
+	for i, c := range node.Children() {
+		if f(i, c) {
+			break
+		}
+	}
 }
