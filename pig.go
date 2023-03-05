@@ -76,16 +76,6 @@ func (n Node) FindChild(ms ...Match) Node {
 	return MakeNode(found...)
 }
 
-func (n Node) Index(i int) (Node, bool) {
-	for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
-		if i == 0 {
-			return c, true
-		}
-		i--
-	}
-	return EmpNode(), false
-}
-
 func (n Node) Text() string {
 	var t string
 	var inner func(n Node)
