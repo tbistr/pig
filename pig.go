@@ -10,13 +10,6 @@ import (
 
 type Node struct{ *html.Node }
 
-func EmpNode() Node {
-	return Node{&html.Node{
-		Type: html.DocumentNode,
-		Attr: []html.Attribute{},
-	}}
-}
-
 func Parse(r io.Reader) (Node, error) {
 	n, err := html.Parse(r)
 	return Node{n}, err
@@ -32,7 +25,7 @@ func ParseB(b []byte) (Node, error) {
 
 func (n Node) Find(m Match) Node {
 	var inner func(Node)
-	found := EmpNode()
+	found := NewRoot()
 	inner = func(in Node) {
 		if m(in) {
 			found.appendChild(in)
@@ -57,7 +50,6 @@ func (n Node) FindDescendant(ms ...Match) Node {
 
 func (n Node) FindChild(ms ...Match) Node {
 	found := n.Children()
-
 	inner := func(ins []Node, m Match) []Node {
 		iFound := []Node{}
 		for _, in := range ins {
@@ -73,36 +65,5 @@ func (n Node) FindChild(ms ...Match) Node {
 	for _, m := range ms {
 		found = inner(found, m)
 	}
-	return MakeNode(found...)
-}
-
-func (n Node) Text() string {
-	var t string
-	var inner func(n Node)
-	inner = func(n Node) {
-		if n.Type == html.TextNode {
-			t += n.Data
-		}
-		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
-			inner(c)
-		}
-	}
-
-	inner(n)
-	return t
-}
-
-func (n Node) Html() (string, error) {
-	var b bytes.Buffer
-	err := html.Render(&b, n.Node)
-	return b.String(), err
-}
-
-func (n Node) AttrVal(attr string) (string, bool) {
-	for _, a := range n.Node.Attr {
-		if a.Key == attr {
-			return a.Val, true
-		}
-	}
-	return "", false
+	return MakeTree(found...)
 }
