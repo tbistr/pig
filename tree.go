@@ -1,6 +1,9 @@
 package pig
 
-import "golang.org/x/net/html"
+import (
+	"golang.org/x/exp/slices"
+	"golang.org/x/net/html"
+)
 
 func NewRoot() Node {
 	return Node{&html.Node{
@@ -11,23 +14,36 @@ func NewRoot() Node {
 func MakeTree(ns ...Node) Node {
 	p := NewRoot()
 	for _, n := range ns {
-		p.appendChild(n)
+		n.CloneDetach()
+		p.AppendChild(n.Node)
 	}
 	return p
 }
 
-func (n Node) appendChild(c Node) {
-	nc := NewRoot()
-	nc.Node.FirstChild = c.Node.FirstChild
-	nc.Node.LastChild = c.Node.LastChild
+func (n Node) Clone() Node {
+	clone := *n.Node
+	clone.Attr = slices.Clone(n.Attr)
+	return Node{&clone}
+}
 
-	nc.Node.Type = c.Type
-	nc.Node.DataAtom = c.DataAtom
-	nc.Node.Data = c.Data
-	nc.Node.Namespace = c.Namespace
-	nc.Node.Attr = c.Attr
+func (n Node) CloneDetach() Node {
+	nc := n.Clone()
+	nc.Node.Parent = nil
+	nc.Node.PrevSibling = nil
+	nc.Node.NextSibling = nil
+	return nc
+}
 
-	n.Node.AppendChild(nc.Node)
+func (n Node) CloneTree() Node {
+	var inner func(Node) Node
+	inner = func(n Node) Node {
+		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
+			subtree := c.CloneDetach()
+			n.AppendChild(inner(subtree).Node)
+		}
+		return n
+	}
+	return inner(n.Clone())
 }
 
 func (n Node) Children() []Node {
