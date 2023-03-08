@@ -23,47 +23,42 @@ func ParseB(b []byte) (Node, error) {
 	return Parse(bytes.NewReader(b))
 }
 
-func (n Node) Find(m Match) Node {
-	var inner func(Node)
+func (n Node) FindWithDepth(m Match, depth int) Node {
+	var find func(Node, int)
 	found := NewRoot()
-	inner = func(in Node) {
-		if m(in) {
-			found.appendChild(in)
+	find = func(subject Node, depth int) {
+		if m(subject) {
+			found.AppendChild(subject.CloneDetach().Node)
 			return
 		}
-		for c := in.FirstChild(); c.Node != nil; c = c.NextSibling() {
-			inner(c)
+		if depth == 0 {
+			return
+		}
+		for c := subject.FirstChild(); c.Node != nil; c = c.NextSibling() {
+			find(c, depth-1)
 		}
 	}
 
-	inner(n)
+	find(n, depth)
+	return found
+}
+
+func (n Node) Find(m Match) Node {
+	return n.FindWithDepth(m, -1)
+}
+
+func (n Node) FindChild(ms ...Match) Node {
+	found := n
+	for _, m := range ms {
+		found = found.FindWithDepth(m, 1)
+	}
 	return found
 }
 
 func (n Node) FindDescendant(ms ...Match) Node {
 	found := n
 	for _, m := range ms {
-		found = found.Find(m)
+		found = found.FindWithDepth(m, -1)
 	}
 	return found
-}
-
-func (n Node) FindChild(ms ...Match) Node {
-	found := n.Children()
-	inner := func(ins []Node, m Match) []Node {
-		iFound := []Node{}
-		for _, in := range ins {
-			for c := in.FirstChild(); c.Node != nil; c = c.NextSibling() {
-				if m(c) {
-					iFound = append(iFound, c)
-				}
-			}
-		}
-		return iFound
-	}
-
-	for _, m := range ms {
-		found = inner(found, m)
-	}
-	return MakeTree(found...)
 }
