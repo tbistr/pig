@@ -95,3 +95,42 @@ func (n Node) FindDescendant(ms ...Match) Node {
 	}
 	return found
 }
+
+// FindAllWithDepth finds nodes that match the given condition.
+//
+// If depth is more than 0, it searches descendants up to the depth.
+// If depth is -1, it searches all descendants.
+//
+// It returns all node that matches the condition.
+// If no node is found, it returns an empty node.
+// Found nodes are bundled in a new root node.
+func (n Node) FindAllWithDepth(m Match, depth int) Node {
+	var find func(Node, int)
+	found := NewRoot()
+	find = func(subject Node, depth int) {
+		if m(subject) {
+			found.AppendChild(subject.CloneDetach().Node)
+		}
+		if depth == 0 {
+			return
+		}
+		for c := subject.FirstChild(); c.Node != nil; c = c.NextSibling() {
+			find(c, depth-1)
+		}
+	}
+
+	find(n, depth)
+	return found
+}
+
+// FindAll finds nodes that match the given condition.
+//
+// It returns all node that matches the condition.
+// If no node is found, it returns an empty node.
+// Found nodes are bundled in a new root node.
+func (n Node) FindAll(m Match) Node {
+	return n.FindAllWithDepth(m, -1)
+}
+
+// TODO: Add other FindAll~ methods?
+// TODO: Make Find~ methods functional option pattern?
