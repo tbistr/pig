@@ -5,12 +5,14 @@ import (
 	"golang.org/x/net/html"
 )
 
+// NewRoot returns a new root node.
 func NewRoot() Node {
 	return Node{&html.Node{
 		Type: html.DocumentNode,
 	}}
 }
 
+// MakeTree makes a new root node and appends given nodes as its children.
 func MakeTree(ns ...Node) Node {
 	p := NewRoot()
 	for _, n := range ns {
@@ -20,12 +22,17 @@ func MakeTree(ns ...Node) Node {
 	return p
 }
 
+// Clone returns a copy of the node.
+// It does not a deep copy, so child, parent, and sibling pointers are not copied.
+// Attributes are copied.
 func (n Node) Clone() Node {
 	clone := *n.Node
 	clone.Attr = slices.Clone(n.Attr)
 	return Node{&clone}
 }
 
+// CloneDetach returns a copy of the node.
+// It makes the copied node a root node, so it has no parent, no siblings but has children same as the original one.
 func (n Node) CloneDetach() Node {
 	nc := n.Clone()
 	nc.Node.Parent = nil
@@ -34,6 +41,7 @@ func (n Node) CloneDetach() Node {
 	return nc
 }
 
+// CloneTree returns a copy of the node and its children.
 func (n Node) CloneTree() Node {
 	var inner func(Node) Node
 	inner = func(n Node) Node {
@@ -46,6 +54,7 @@ func (n Node) CloneTree() Node {
 	return inner(n.Clone())
 }
 
+// Children returns a slice of all children of the node.
 func (n Node) Children() []Node {
 	found := []Node{}
 	for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
@@ -55,6 +64,7 @@ func (n Node) Children() []Node {
 	return found
 }
 
+// Len returns the number of children of the node.
 func (n Node) Len() int {
 	i := 0
 	for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
@@ -63,6 +73,9 @@ func (n Node) Len() int {
 	return i
 }
 
+// GetE returns the child node at the given index.
+// If the index is negative, it counts from the end of the children.
+// It returns the node and a boolean indicating whether the node was found.
 func (n Node) GetE(index int) (Node, bool) {
 	if index < 0 {
 		for c := n.LastChild(); c.Node != nil; c = c.PrevSibling() {
@@ -82,15 +95,20 @@ func (n Node) GetE(index int) (Node, bool) {
 	return NewRoot(), false
 }
 
+// Get returns the child node at the given index.
+// If the index is negative, it counts from the end of the children.
+// If the index is out of range, it returns a new empty node.
 func (n Node) Get(index int) Node {
 	v, _ := n.GetE(index)
 	return v
 }
 
+// First returns the first child node.
 func (n Node) First() Node {
 	return n.Get(0)
 }
 
+// Last returns the last child node.
 func (n Node) Last() Node {
 	return n.Get(-1)
 }

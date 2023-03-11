@@ -85,8 +85,8 @@ func TestMatch_Not(t *testing.T) {
 		m    Match
 		want bool
 	}{
-		"T": {T, false},
-		"F": {F, true},
+		"~T": {T, false},
+		"~F": {F, true},
 	} {
 		t.Run(name, func(t *testing.T) {
 			if got := tt.m.Not()(div_2attrs); got != tt.want {
