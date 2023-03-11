@@ -99,3 +99,10 @@ func HasAttrVal(attr, val string) Match {
 		return ok && mayVal == val
 	}
 }
+
+// Atom returns a Match that returns true if the given node's atom is the given atom.
+func Atom(a atom.Atom) Match {
+	return func(n Node) bool {
+		return n.DataAtom == a
+	}
+}
