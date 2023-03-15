@@ -47,18 +47,19 @@ func (n Node) CloneDetach() Node {
 	return nc
 }
 
-// CloneTree returns a copy of the node and its children.
-func (n Node) CloneTree() Node {
-	var inner func(Node) Node
-	inner = func(n Node) Node {
-		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
-			subtree := c.CloneDetach()
-			n.AppendChild(inner(subtree).Node)
-		}
-		return n
-	}
-	return inner(n.Clone())
-}
+// CloneDetachSubtree returns a copy of the subtree that the node is the root.
+// The subtree is detached from its parent and siblings.
+// func (n Node) CloneDetachSubtree() Node {
+// 	var inner func(Node) Node
+// 	inner = func(n Node) Node {
+// 		for c := n.FirstChild(); c.Node != nil; c = c.NextSibling() {
+// 			subtree := c.CloneDetach()
+// 			n.AppendChild(inner(subtree).Node)
+// 		}
+// 		return n
+// 	}
+// 	return inner(n.CloneDetach())
+// }
 
 // Children returns a slice of all children of the node.
 func (n Node) Children() []Node {
