@@ -36,7 +36,9 @@ func (n Node) Clone() Node {
 }
 
 // CloneDetach returns a copy of the node.
-// It makes the copied node a root node, so it has no parent, no siblings but has children same as the original one.
+//
+// The node is detached from its parent and siblings.
+// It has same children as the original one.
 func (n Node) CloneDetach() Node {
 	nc := n.Clone()
 	nc.Node.Parent = nil

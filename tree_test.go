@@ -76,3 +76,37 @@ func TestNode_Clone(t *testing.T) {
 		t.Error("cloned copy must have same attributes but got different ones")
 	}
 }
+
+func TestNode_CloneDetach(t *testing.T) {
+	//    p
+	//  / | \
+	// s1 n  s2
+	//    | \
+	//    c1 c2
+	p := makeNode("parent")
+	s1 := makeNode("sibling1")
+	s2 := makeNode("sibling2")
+	c1 := makeNode("child1")
+	c2 := makeNode("child2")
+	n := makeNode("some data")
+	n.Node.Parent = p.Node
+	n.Node.PrevSibling = s1.Node
+	n.Node.NextSibling = s2.Node
+	n.Node.AppendChild(c1.Node)
+	n.Node.AppendChild(c2.Node)
+
+	detached := n.CloneDetach()
+
+	if detached.Node == n.Node {
+		t.Error("Node.CloneDetach must return a new node but got similar pointer")
+	}
+	if detached.Parent().Node != nil ||
+		detached.PrevSibling().Node != nil ||
+		detached.NextSibling().Node != nil {
+		t.Error("detached node must have no parent and siblings but got some")
+	}
+	if detached.FirstChild().Node != c1.Node ||
+		detached.LastChild().Node != c2.Node {
+		t.Error("detached node must have same children but got different ones")
+	}
+}
