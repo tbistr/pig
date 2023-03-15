@@ -13,6 +13,8 @@ func NewRoot() Node {
 }
 
 // MakeTree makes a new root node and appends given nodes as its children.
+// Given nodes are cloned and detached from their original parent.
+// Original nodes are not modified.
 func MakeTree(ns ...Node) Node {
 	p := NewRoot()
 	for _, n := range ns {
