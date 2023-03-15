@@ -110,3 +110,40 @@ func TestNode_CloneDetach(t *testing.T) {
 		t.Error("detached node must have same children but got different ones")
 	}
 }
+
+func TestNode_GetE(t *testing.T) {
+	c1 := makeNode("c1")
+	c2 := makeNode("c2")
+	c3 := makeNode("c3")
+	tree := NewRoot()
+	tree.AppendChild(c1.Node)
+	tree.AppendChild(c2.Node)
+	tree.AppendChild(c3.Node)
+
+	for name, tt := range map[string]struct {
+		node      Node
+		i         int
+		want      Node
+		wantExist bool
+	}{
+		"empty":        {NewRoot(), 0, Node{}, false},
+		"out of range": {tree, 3, Node{}, false},
+
+		"first":    {tree, 0, c1, true},
+		"second":   {tree, 1, c2, true},
+		"last":     {tree, -1, c3, true},
+		"negative": {tree, -2, c2, true},
+	} {
+		t.Run(name, func(t *testing.T) {
+
+			got, gotExist := tt.node.GetE(tt.i)
+
+			if gotExist != tt.wantExist {
+				t.Errorf("GetE(%v) must returns exist == %t but got %t", tt.i, tt.wantExist, gotExist)
+			}
+			if tt.wantExist && got.Node != tt.want.Node {
+				t.Errorf("GetE(%v) must returns node == %v but got %v", tt.i, tt.want, got)
+			}
+		})
+	}
+}

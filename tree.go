@@ -81,8 +81,10 @@ func (n Node) Len() int {
 }
 
 // GetE returns the child node at the given index.
-// If the index is negative, it counts from the end of the children.
-// It returns the node and a boolean indicating whether the node was found.
+//
+// You can use negative index same as slices.
+// Second return value is true if index is in range.
+// If the index is out of range, it returns a new empty node and false.
 func (n Node) GetE(index int) (Node, bool) {
 	if index < 0 {
 		for c := n.LastChild(); c.Node != nil; c = c.PrevSibling() {
@@ -103,8 +105,9 @@ func (n Node) GetE(index int) (Node, bool) {
 }
 
 // Get returns the child node at the given index.
-// If the index is negative, it counts from the end of the children.
-// If the index is out of range, it returns a new empty node.
+//
+// You can use negative index same as slices.
+// If the index is out of range, it returns a new empty node and false.
 func (n Node) Get(index int) Node {
 	v, _ := n.GetE(index)
 	return v
