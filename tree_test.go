@@ -42,3 +42,37 @@ func TestMakeTree(t *testing.T) {
 		}
 	})
 }
+
+func TestNode_Clone(t *testing.T) {
+	p := makeNode("parent")
+	s := makeNode("sibling")
+	n := Node{&html.Node{
+		Type: html.ElementNode,
+		Data: "some data",
+		Attr: []html.Attribute{
+			{Key: "a", Val: "b"},
+			{Key: "c", Val: "d"},
+		},
+		Parent:      p.Node,
+		NextSibling: s.Node,
+	}}
+	n.Node.AppendChild(makeNode("child").Node)
+
+	clone := n.Clone()
+
+	if clone.Node == n.Node {
+		t.Error("Node.Clone must return a new node but got similar pointer")
+	}
+	if clone.Parent().Node != n.Parent().Node ||
+		clone.NextSibling().Node != n.NextSibling().Node ||
+		clone.FirstChild().Node != n.FirstChild().Node {
+		t.Error("cloned copy must have same parents, siblings, and children but got different ones")
+	}
+	if &clone.Attr == &n.Attr {
+		t.Error("cloned copy must have different attributes but got similar pointer")
+	}
+	// Each attribute is a struct value, so no need to check pointer.
+	if !reflect.DeepEqual(clone.Attr, n.Attr) {
+		t.Error("cloned copy must have same attributes but got different ones")
+	}
+}

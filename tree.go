@@ -13,6 +13,7 @@ func NewRoot() Node {
 }
 
 // MakeTree makes a new root node and appends given nodes as its children.
+//
 // Given nodes are cloned and detached from their original parent.
 // Original nodes are not modified.
 func MakeTree(ns ...Node) Node {
@@ -24,7 +25,9 @@ func MakeTree(ns ...Node) Node {
 }
 
 // Clone returns a copy of the node.
-// It does not a deep copy, so child, parent, and sibling pointers are not copied.
+//
+// It does not a deep copy about the connected nodes.
+// So child, parent, and sibling are same pointers as the original one.
 // Attributes are copied.
 func (n Node) Clone() Node {
 	clone := *n.Node
