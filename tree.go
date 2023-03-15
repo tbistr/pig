@@ -18,8 +18,7 @@ func NewRoot() Node {
 func MakeTree(ns ...Node) Node {
 	p := NewRoot()
 	for _, n := range ns {
-		n.CloneDetach()
-		p.AppendChild(n.Node)
+		p.AppendChild(n.CloneDetach().Node)
 	}
 	return p
 }
